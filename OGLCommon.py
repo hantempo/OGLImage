@@ -6,6 +6,8 @@ def enum(*sequential, **named):
     return type('Enum', (), enums)
 
 OGLEnum = enum(
+    GL_NONE                         = 0x0000,
+
     GL_TEXTURE_2D                   = 0x0DE1,
     GL_TEXTURE_CUBE_MAP             = 0x8513,
     GL_TEXTURE_CUBE_MAP_POSITIVE_X  = 0x8515,
@@ -38,5 +40,6 @@ OGLEnum = enum(
     GL_DEPTH_COMPONENT16            = 0x81A5,
     GL_STENCIL_INDEX8               = 0x8D48,
 
+    GL_ETC1_RGB8_OES                = 0x8D64,
     GL_COMPRESSED_RGB8_ETC2         = 0x9274,
     )
