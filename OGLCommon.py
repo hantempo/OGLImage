@@ -38,6 +38,5 @@ OGLEnum = enum(
     GL_DEPTH_COMPONENT16            = 0x81A5,
     GL_STENCIL_INDEX8               = 0x8D48,
 
-    GL_RGB8                         = 0x8051,
     GL_COMPRESSED_RGB8_ETC2         = 0x9274,
     )
