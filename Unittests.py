@@ -22,5 +22,11 @@ class TestImageConverter(unittest.TestCase):
         self.assertTrue(RGB8ToETC1.dest_format == OGLEnum.GL_ETC1_RGB8_OES)
         RGB8ToETC1.Convert(Image2D())
 
+    def test_Convert(self):
+        im = Image2D(internalformat=OGLEnum.GL_RGB8)
+        om = Convert(im, OGLEnum.GL_ETC1_RGB8_OES)
+
 if __name__ == '__main__':
+    import logging
+    logging.basicConfig(level=logging.DEBUG)
     unittest.main()
