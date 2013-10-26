@@ -2,22 +2,15 @@ import logging
 logger = logging.getLogger(__name__)
 
 import networkx as nx
-from OGLCommon import OGLEnum
+import os, sys, subprocess
+
+from OGLCommon import OGLEnum, GetImageSize
 from UtilCommon import Which
+from OGLImage import Image2D
+from OGLImageIO import SaveImage, LoadImage
 
-class Image2D(object):
-
-    def __init__(self, width=0, height=0,
-        internalformat=OGLEnum.GL_NONE,
-        dataSize=0, data=None):
-        self.width = width
-        self.height = height
-        self.internalformat = internalformat
-        self.dataSize = dataSize
-        self.data = data
-
-    def __repr__(self):
-        return 'Image2D : dimension({0}x{1}), internalformat({2}), dataSize({3})'.format(self.width, self.height, OGLEnum.names[self.internalformat], self.dataSize)
+ETCPACK_NAME = 'etcpack'
+ETCPACK_PATH = Which(ETCPACK_NAME)
 
 def _RegisterConverter(converter_graph, converter_class):
     converter_graph.add_nodes_from([
@@ -44,13 +37,37 @@ class RGB8ToETC1(object):
 
     @staticmethod
     def Convert(input_image):
+        if not ETCPACK_PATH:
+            logger.error('Cannot find the "etcpack" convertion tool in the environment $PATH')
+            return input_image
+
+        # for empty image
+        width = input_image.width
+        height = input_image.height
+        dataSize = GetImageSize(width, height, OGLEnum.GL_ETC1_RGB8_OES)
+        if input_image.IsEmpty():
+            return Image2D(width=width, height=height,
+                internalformat=OGLEnum.GL_ETC1_RGB8_OES,
+                dataSize=dataSize)
+
         logger.debug('Conversion from RGB8 to ETC1')
         logger.debug('Input image : {0}'.format(str(input_image)))
 
+        # save the input image as PPM format
+        ppm_filepath = 'temp.ppm'
+        ktx_filepath = 'temp.ktx'
+        SaveImage(ppm_filepath, input_image)
 
+        # call etcpack to convert as KTX format
+        command = ' '.join((ETCPACK_PATH, ppm_filepath, os.curdir, '-ktx', '-c etc1'))
+        logger.debug('Command : "{0}"'.format(command))
+        subprocess.call(command, shell=True)
 
-        logger.debug('Output image : {0}'.format(str(input_image)))
-        return input_image
+        # load the KTX format
+        output_image = LoadImage(ktx_filepath)
+
+        logger.debug('Output image : {0}'.format(str(output_image)))
+        return output_image
 
 _converters = nx.DiGraph()
 _RegisterConverter(_converters, RGB8ToETC1)

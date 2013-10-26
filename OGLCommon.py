@@ -1,3 +1,7 @@
+import logging
+logger = logging.getLogger(__name__)
+
+from math import ceil
 
 def enum(*sequential, **named):
     enums = dict(zip(sequential, range(len(sequential))), **named)
@@ -42,4 +46,33 @@ OGLEnum = enum(
 
     GL_ETC1_RGB8_OES                = 0x8D64,
     GL_COMPRESSED_RGB8_ETC2         = 0x9274,
+    GL_COMPRESSED_SRGB8_ETC2        = 0x9275,
+    GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2 = 0x9276,
+    GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2 = 0x9277,
+    GL_COMPRESSED_RGBA8_ETC2_EAC    = 0x9278,
+    GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC = 0x9279,
     )
+
+ETC_64BIT_FORMATS = (
+    OGLEnum.GL_ETC1_RGB8_OES,
+    OGLEnum.GL_COMPRESSED_RGB8_ETC2,
+    OGLEnum.GL_COMPRESSED_SRGB8_ETC2,
+    OGLEnum.GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2,
+    OGLEnum.GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2,
+)
+
+ETC_128BIT_FORMATS = (
+    OGLEnum.GL_COMPRESSED_RGBA8_ETC2_EAC,
+    OGLEnum.GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC,
+)
+
+# return image size in bytes
+def GetImageSize(width, height, internalformat):
+    if internalformat in ETC_64BIT_FORMATS:
+        return ceil(width / 4.0) * ceil(height / 4.0) * 8
+
+    if internalformat in ETC_128BIT_FORMATS:
+        return ceil(width / 4.0) * ceil(height / 4.0) * 16
+
+    logger.error('unexpected internal format : {0}'.format(OGLEnum.names[internalformat]))
+    return 0
