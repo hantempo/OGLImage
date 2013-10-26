@@ -3,7 +3,21 @@ logger = logging.getLogger(__name__)
 
 import networkx as nx
 from OGLCommon import OGLEnum
-from Image import Image2D
+from UtilCommon import Which
+
+class Image2D(object):
+
+    def __init__(self, width=0, height=0,
+        internalformat=OGLEnum.GL_NONE,
+        dataSize=0, data=None):
+        self.width = width
+        self.height = height
+        self.internalformat = internalformat
+        self.dataSize = dataSize
+        self.data = data
+
+    def __repr__(self):
+        return 'Image2D : dimension({0}x{1}), internalformat({2}), dataSize({3})'.format(self.width, self.height, OGLEnum.names[self.internalformat], self.dataSize)
 
 def _RegisterConverter(converter_graph, converter_class):
     converter_graph.add_nodes_from([
@@ -32,6 +46,8 @@ class RGB8ToETC1(object):
     def Convert(input_image):
         logger.debug('Conversion from RGB8 to ETC1')
         logger.debug('Input image : {0}'.format(str(input_image)))
+
+
 
         logger.debug('Output image : {0}'.format(str(input_image)))
         return input_image
