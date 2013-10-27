@@ -53,7 +53,6 @@ def _Image2DConverterFactory(class_name, src_format, dst_format,
             SaveImage(input_filename, input_image)
             RunCommand(tool_cmd)
             output_image = LoadImage(output_filename)
-            print output_image.internalformat
 
             logger.debug('Output image : {0}'.format(str(output_image)))
             return output_image
@@ -70,8 +69,18 @@ _RegisterConverter(_converters, RGB8ToETC1)
 
 ETC1ToRGB8 = _Image2DConverterFactory('ETC1ToRGB8',
     OGLEnum.GL_ETC1_RGB8_OES, OGLEnum.GL_RGB8,
-    'temp1.ktx', 'temp1.ppm', ' '.join((ETCPACK_NAME, 'temp1.ktx', os.curdir, '-ktx', '-c etc1')))
-_RegisterConverter(_converters, RGB8ToETC1)
+    'temp.ktx', 'temp.ppm', ' '.join((ETCPACK_NAME, 'temp.ktx', os.curdir, '-ktx', '-c etc1')))
+_RegisterConverter(_converters, ETC1ToRGB8)
+
+RGB8ToETC2 = _Image2DConverterFactory('RGB8ToETC2',
+    OGLEnum.GL_RGB8, OGLEnum.GL_COMPRESSED_RGB8_ETC2,
+    'temp.ppm', 'temp.ktx', ' '.join((ETCPACK_NAME, 'temp.ppm', os.curdir, '-ktx', '-c etc2')))
+_RegisterConverter(_converters, RGB8ToETC2)
+
+ETC2ToRGB8 = _Image2DConverterFactory('ETC2ToRGB8',
+    OGLEnum.GL_COMPRESSED_RGB8_ETC2, OGLEnum.GL_RGB8,
+    'temp.ktx', 'temp.ppm', ' '.join((ETCPACK_NAME, 'temp.ktx', os.curdir, '-ktx', '-c etc2')))
+_RegisterConverter(_converters, ETC2ToRGB8)
 
 def Convert(input_image, dest_format):
     try:
@@ -79,6 +88,7 @@ def Convert(input_image, dest_format):
         for src_node, dest_node in zip(path[:-1], path[1:]):
             con = _converters[src_node][dest_node]['converter']
             input_image = con.Convert(input_image)
-    except nx.NetworkXError:
+        return input_image
+    except nx.NetworkXNoPath:
         logger.error('Cannot find conversions from {0} to {1}'.format(OGLEnum.names[input_image.internalformat], OGLEnum.names[dest_format]))
         return Image2D()
