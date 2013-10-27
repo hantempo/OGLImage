@@ -29,16 +29,23 @@ class TestImageConverter(unittest.TestCase):
         self.assertEqual(output.dataSize, 8)
         self.assertTrue(output.IsEmpty())
 
-        data = 'FFFFFF0000000F0F0FF0F0F0'.decode('hex')
-        out_data = '7B7B7BFD111E333F'.decode('hex')
-        output = RGB8ToETC1.Convert(Image2D(2, 2,
-            internalformat=OGLEnum.GL_RGB8, dataSize=len(data), data=data))
-        self.assertEqual(output.width, 2)
-        self.assertEqual(output.height, 2)
-        self.assertEqual(output.internalformat, OGLEnum.GL_ETC1_RGB8_OES)
-        self.assertEqual(output.dataSize, len(out_data))
-        self.assertTrue(not output.IsEmpty())
-        self.assertEqual(output.data, out_data)
+        raw_data = 'FFFFFF0000000F0F0FF0F0F0'.decode('hex')
+        etc1_data = '7B7B7BFD111E333F'.decode('hex')
+        etc1_image = RGB8ToETC1.Convert(Image2D(2, 2,
+            internalformat=OGLEnum.GL_RGB8, dataSize=len(raw_data), data=raw_data))
+        self.assertEqual(etc1_image.width, 2)
+        self.assertEqual(etc1_image.height, 2)
+        self.assertEqual(etc1_image.internalformat, OGLEnum.GL_ETC1_RGB8_OES)
+        self.assertEqual(etc1_image.dataSize, len(etc1_data))
+        self.assertTrue(not etc1_image.IsEmpty())
+        self.assertEqual(etc1_image.data, etc1_data)
+
+        raw_image = ETC1ToRGB8.Convert(etc1_image)
+        self.assertEqual(raw_image.width, 2)
+        self.assertEqual(raw_image.height, 2)
+        self.assertEqual(raw_image.internalformat, OGLEnum.GL_RGB8)
+        self.assertEqual(raw_image.dataSize, len(raw_data))
+        self.assertTrue(not raw_image.IsEmpty())
 
     def test_Convert(self):
         im = Image2D(internalformat=OGLEnum.GL_RGB8)

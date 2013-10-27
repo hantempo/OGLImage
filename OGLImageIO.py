@@ -3,7 +3,7 @@ logger = logging.getLogger(__name__)
 
 import Image, os, struct
 
-from OGLCommon import OGLEnum
+from OGLCommon import OGLEnum, GetGLType, GetGLFormat, GetGLTypeSize
 from OGLImage import Image2D
 
 def SaveImage(filepath, image):
@@ -14,7 +14,7 @@ def SaveImage(filepath, image):
     ext = os.path.splitext(filepath)[-1]
 
     if ext == '.ktx':
-        logger.error('Should not here')
+        SaveKTXImage(filepath, image)
     else:
         # use Image module
         format_dict = {
@@ -37,7 +37,38 @@ def LoadImage(filepath):
     if ext == '.ktx':
         return LoadKTXImage(filepath)
     else:
-        logger.error('Should not here')
+        im = Image.open(filepath)
+        format_dict = {
+            'RGB'       : OGLEnum.GL_RGB8,
+            'RGBA'      : OGLEnum.GL_RGBA8,
+        }
+        width, height = im.size
+        data = im.tostring()
+        return Image2D(width=width, height=height,
+            internalformat=format_dict[im.mode],
+            dataSize=len(data), data=data)
+
+def SaveKTXImage(filepath, image):
+
+    with open(filepath, 'w') as f:
+        identifier = '\xabKTX 11\xbb\r\n\x1a\n'
+        f.write(identifier)
+
+        endianness = 0x04030201
+        width = image.width
+        height = image.height
+        internalformat = image.internalformat
+        glType = GetGLType(internalformat)
+        glTypeSize = GetGLTypeSize(glType)
+        glFormat = GetGLFormat(internalformat)
+        header_data = (endianness, glType, glTypeSize, glFormat,
+            internalformat, glFormat, width, height, 0,
+            0, 1, 1, 0, image.dataSize)
+        header = struct.pack('I'*14, *header_data)
+        f.write(header)
+
+        if image.dataSize:
+            f.write(image.data)
 
 def LoadKTXImage(filepath):
 

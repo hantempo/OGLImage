@@ -10,7 +10,6 @@ from OGLImage import Image2D
 from OGLImageIO import SaveImage, LoadImage
 
 ETCPACK_NAME = 'etcpack'
-ETCPACK_PATH = Which(ETCPACK_NAME)
 
 def _RegisterConverter(converter_graph, converter_class):
     converter_graph.add_nodes_from([
@@ -23,52 +22,55 @@ def _RegisterConverter(converter_graph, converter_class):
          {'converter' : converter_class}),
         ])
 
-class ImageConverter(object):
+def _Image2DConverterFactory(class_name, src_format, dst_format,
+    input_filename = None, output_filename = None, tool_cmd = None):
 
-    @staticmethod
-    def Convert(input_image):
-        logger.error('The base ImageConverter should not be called')
-        return input_image
+    class class_name(object):
+        source_format = src_format
+        dest_format = dst_format
 
-class RGB8ToETC1(object):
+        @staticmethod
+        def Convert(input_image):
+            # for empty image
+            width = input_image.width
+            height = input_image.height
+            dataSize = GetImageSize(width, height, dst_format)
+            if input_image.IsEmpty():
+                return Image2D(width=width, height=height,
+                    internalformat=dst_format,
+                    dataSize=dataSize)
 
-    source_format = OGLEnum.GL_RGB8
-    dest_format = OGLEnum.GL_ETC1_RGB8_OES
+            tool_filename = tool_cmd.split()[0]
+            if not Which(tool_filename):
+                logger.error('Cannot find the specified tool ({0}) in the environment $PATH, return the input image'.format(tool_filename))
+                return input_image
 
-    @staticmethod
-    def Convert(input_image):
-        if not ETCPACK_PATH:
-            logger.error('Cannot find the "etcpack" convertion tool in the environment $PATH')
-            return input_image
+            logger.debug('Convert from {0} to {1}'.format(
+                OGLEnum.names[src_format],
+                OGLEnum.names[dst_format]))
+            logger.debug('Input image : {0}'.format(str(input_image)))
 
-        # for empty image
-        width = input_image.width
-        height = input_image.height
-        dataSize = GetImageSize(width, height, OGLEnum.GL_ETC1_RGB8_OES)
-        if input_image.IsEmpty():
-            return Image2D(width=width, height=height,
-                internalformat=OGLEnum.GL_ETC1_RGB8_OES,
-                dataSize=dataSize)
+            SaveImage(input_filename, input_image)
+            RunCommand(tool_cmd)
+            output_image = LoadImage(output_filename)
+            print output_image.internalformat
 
-        logger.debug('Conversion from RGB8 to ETC1')
-        logger.debug('Input image : {0}'.format(str(input_image)))
+            logger.debug('Output image : {0}'.format(str(output_image)))
+            return output_image
 
-        # save the input image as PPM format
-        ppm_filepath = 'temp.ppm'
-        ktx_filepath = 'temp.ktx'
-        SaveImage(ppm_filepath, input_image)
+    return class_name
 
-        # call etcpack to convert as KTX format
-        command = ' '.join((ETCPACK_PATH, ppm_filepath, os.curdir, '-ktx', '-c etc1'))
-        RunCommand(command)
-
-        # load the KTX format
-        output_image = LoadImage(ktx_filepath)
-
-        logger.debug('Output image : {0}'.format(str(output_image)))
-        return output_image
-
+# construct and register converter classes
 _converters = nx.DiGraph()
+
+RGB8ToETC1 = _Image2DConverterFactory('RGB8ToETC1',
+    OGLEnum.GL_RGB8, OGLEnum.GL_ETC1_RGB8_OES,
+    'temp.ppm', 'temp.ktx', ' '.join((ETCPACK_NAME, 'temp.ppm', os.curdir, '-ktx', '-c etc1')))
+_RegisterConverter(_converters, RGB8ToETC1)
+
+ETC1ToRGB8 = _Image2DConverterFactory('ETC1ToRGB8',
+    OGLEnum.GL_ETC1_RGB8_OES, OGLEnum.GL_RGB8,
+    'temp1.ktx', 'temp1.ppm', ' '.join((ETCPACK_NAME, 'temp1.ktx', os.curdir, '-ktx', '-c etc1')))
 _RegisterConverter(_converters, RGB8ToETC1)
 
 def Convert(input_image, dest_format):
