@@ -2,10 +2,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 import networkx as nx
-import os, sys, subprocess
+import os, sys
 
 from OGLCommon import OGLEnum, GetImageSize
-from UtilCommon import Which
+from UtilCommon import Which, RunCommand
 from OGLImage import Image2D
 from OGLImageIO import SaveImage, LoadImage
 
@@ -60,8 +60,7 @@ class RGB8ToETC1(object):
 
         # call etcpack to convert as KTX format
         command = ' '.join((ETCPACK_PATH, ppm_filepath, os.curdir, '-ktx', '-c etc1'))
-        logger.debug('Command : "{0}"'.format(command))
-        subprocess.call(command, shell=True)
+        RunCommand(command)
 
         # load the KTX format
         output_image = LoadImage(ktx_filepath)

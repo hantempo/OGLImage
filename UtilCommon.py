@@ -1,6 +1,8 @@
 import logging
 logger = logging.getLogger(__name__)
 
+import subprocess
+
 def Which(program):
     import os
     def is_exe(fpath):
@@ -18,3 +20,10 @@ def Which(program):
                 return exe_file
 
     return None
+
+def RunCommand(command):
+    logger.debug('Command : "{0}"'.format(command))
+    p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    output, error = p.communicate()
+    map(lambda l : logger.debug(l), output.splitlines())
+    map(lambda l : logger.error(l), error.splitlines())
