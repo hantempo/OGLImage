@@ -82,6 +82,16 @@ ETC2ToRGB8 = _Image2DConverterFactory('ETC2ToRGB8',
     'temp.ktx', 'temp.ppm', ' '.join((ETCPACK_NAME, 'temp.ktx', os.curdir, '-ktx', '-c etc2')))
 _RegisterConverter(_converters, ETC2ToRGB8)
 
+RGBA8ToETC2_ALHPA1 = _Image2DConverterFactory('RGBA8ToETC2_ALHP1',
+    OGLEnum.GL_RGBA8, OGLEnum.GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2,
+    'temp.tga', 'temp.ktx', ' '.join((ETCPACK_NAME, 'temp.tga', os.curdir, '-ktx', '-c etc2', '-f RGBA1')))
+_RegisterConverter(_converters, RGBA8ToETC2_ALHPA1)
+
+ETC2_ALPHA1ToRGBA8 = _Image2DConverterFactory('ETC2_ALPHA1ToRGBA8',
+    OGLEnum.GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2, OGLEnum.GL_RGBA8,
+    'temp.ktx', 'temp.tga', ' '.join((ETCPACK_NAME, 'temp.ktx', os.curdir, '-ktx', '-c etc2')))
+_RegisterConverter(_converters, ETC2_ALPHA1ToRGBA8)
+
 def Convert(input_image, dest_format):
     try:
         path = nx.shortest_path(_converters, input_image.internalformat, dest_format)
