@@ -42,8 +42,10 @@ def _Image2DConverterFactory(class_name, src_format, dst_format,
 
             tool_filename = tool_cmd.split()[0]
             if not Which(tool_filename):
-                logger.error('Cannot find the specified tool ({0}) in the environment $PATH, return the input image'.format(tool_filename))
-                return input_image
+                logger.error('Cannot find the specified tool ({0}) in the environment $PATH, return an empty image with dest format'.format(tool_filename))
+                return Image2D(width=width, height=height,
+                    internalformat=dst_format,
+                    dataSize=dataSize)
 
             logger.debug('Convert from {0} to {1}'.format(
                 OGLEnum.names[src_format],
