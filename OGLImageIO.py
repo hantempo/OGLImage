@@ -30,7 +30,7 @@ def SaveImage(filepath, image):
 def LoadImage(filepath):
 
     if not os.path.exists(filepath):
-        logger.error('Cannot find the specified file, return an empty image')
+        logger.error('Cannot find the specified file ({0}), return an empty image'.format(filepath))
         return Image2D()
 
     ext = os.path.splitext(filepath)[-1]
@@ -73,7 +73,7 @@ def SaveKTXImage(filepath, image):
 def LoadKTXImage(filepath):
 
     if not os.path.exists(filepath):
-        logger.error('Cannot find the specified file, return an empty image')
+        logger.error('Cannot find the specified file ({0}), return an empty image'.format(filepath))
         return Image2D()
 
     with open(filepath) as f:

@@ -149,9 +149,9 @@ def GetPixelSize(internalformat):
 # return image size in bytes
 def GetImageSize(width, height, internalformat):
     if internalformat in ETC_64BIT_FORMATS:
-        return ceil(width / 4.0) * ceil(height / 4.0) * 8
+        return int(ceil(width/4.) * ceil(height/4.) * 8)
 
     if internalformat in ETC_128BIT_FORMATS:
-        return ceil(width / 4.0) * ceil(height / 4.0) * 16
+        return int(ceil(width/4.) * ceil(height/4.) * 16)
 
     return width * height * GetPixelSize(internalformat)

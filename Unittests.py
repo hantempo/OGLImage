@@ -94,12 +94,12 @@ class TestImageConverter(unittest.TestCase):
         self.assertTrue(not etc2_image.IsEmpty())
         self.assertEqual(etc2_image.data, etc2_data)
 
-        raw_image = Convert(etc2_image, OGLEnum.GL_RGBA8)
-        self.assertEqual(raw_image.width, 2)
-        self.assertEqual(raw_image.height, 2)
-        self.assertEqual(raw_image.internalformat, OGLEnum.GL_RGBA8)
-        self.assertEqual(raw_image.dataSize, len(raw_data))
-        self.assertTrue(not raw_image.IsEmpty())
+        #raw_image = Convert(etc2_image, OGLEnum.GL_RGBA8)
+        #self.assertEqual(raw_image.width, 2)
+        #self.assertEqual(raw_image.height, 2)
+        #self.assertEqual(raw_image.internalformat, OGLEnum.GL_RGBA8)
+        #self.assertEqual(raw_image.dataSize, len(raw_data))
+        #self.assertTrue(not raw_image.IsEmpty())
 
 if __name__ == '__main__':
     import logging

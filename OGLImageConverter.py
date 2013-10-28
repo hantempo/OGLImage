@@ -5,7 +5,7 @@ import networkx as nx
 import os, sys
 
 from OGLCommon import OGLEnum, GetImageSize
-from UtilCommon import Which, RunCommand
+from UtilCommon import Which, RunCommand, Delete
 from OGLImage import Image2D
 from OGLImageIO import SaveImage, LoadImage
 
@@ -55,6 +55,8 @@ def _Image2DConverterFactory(class_name, src_format, dst_format,
             SaveImage(input_filename, input_image)
             RunCommand(tool_cmd)
             output_image = LoadImage(output_filename)
+            Delete(input_filename)
+            Delete(output_filename)
 
             logger.debug('Output image : {0}'.format(str(output_image)))
             return output_image

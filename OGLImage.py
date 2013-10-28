@@ -7,7 +7,7 @@ class Image2D(object):
 
     def __init__(self, width=0, height=0,
         internalformat=OGLEnum.GL_NONE,
-        dataSize=0, data=None):
+        dataSize=0, data=''):
         self.width = width
         self.height = height
         self.internalformat = internalformat
