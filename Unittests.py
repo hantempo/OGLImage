@@ -28,6 +28,7 @@ class TestImageConverter(unittest.TestCase):
 
         raw_data = 'FFFFFF0000000F0F0FF0F0F0'.decode('hex')
         etc1_data = '7B7B7BFD111E333F'.decode('hex')
+        uncom_data = 'FFFFFF000000000000FFFFFF'.decode('hex')
         etc1_image = Convert(Image2D(2, 2,
             internalformat=OGLEnum.GL_RGB8, dataSize=len(raw_data), data=raw_data),
             OGLEnum.GL_ETC1_RGB8_OES)
@@ -43,7 +44,7 @@ class TestImageConverter(unittest.TestCase):
         self.assertEqual(raw_image.height, 2)
         self.assertEqual(raw_image.internalformat, OGLEnum.GL_RGB8)
         self.assertEqual(raw_image.dataSize, len(raw_data))
-        self.assertTrue(not raw_image.IsEmpty())
+        self.assertEqual(raw_image.data, uncom_data)
 
     def test_RGB8ToETC2(self):
         empty_image = Image2D(2, 2, internalformat=OGLEnum.GL_RGB8, dataSize=12)
@@ -56,6 +57,7 @@ class TestImageConverter(unittest.TestCase):
 
         raw_data = 'FFFFFF0000000F0F0FF0F0F0'.decode('hex')
         etc2_data = 'FAEE00071110000E'.decode('hex')
+        uncom_data = 'EEEEEE000000101010EEEEEE'.decode('hex')
         etc2_image = Convert(Image2D(2, 2,
             internalformat=OGLEnum.GL_RGB8, dataSize=len(raw_data), data=raw_data),
             OGLEnum.GL_COMPRESSED_RGB8_ETC2)
@@ -72,6 +74,7 @@ class TestImageConverter(unittest.TestCase):
         self.assertEqual(raw_image.internalformat, OGLEnum.GL_RGB8)
         self.assertEqual(raw_image.dataSize, len(raw_data))
         self.assertTrue(not raw_image.IsEmpty())
+        self.assertEqual(raw_image.data, uncom_data)
 
     def test_RGBA8ToETC2_ALPHA1(self):
         empty_image = Image2D(2, 2, internalformat=OGLEnum.GL_RGBA8, dataSize=16)
@@ -84,6 +87,7 @@ class TestImageConverter(unittest.TestCase):
 
         raw_data = 'FFFFFFFF000000000F0F0F0FF0F0F0F0'.decode('hex')
         etc2_data = '0400EEE0001EEEE1'.decode('hex')
+        uncom_data = 'F1F1F1FF0000000000000000F1F1F1FF'.decode('hex')
         etc2_image = Convert(Image2D(2, 2,
             internalformat=OGLEnum.GL_RGBA8, dataSize=len(raw_data), data=raw_data),
             OGLEnum.GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2)
@@ -94,12 +98,13 @@ class TestImageConverter(unittest.TestCase):
         self.assertTrue(not etc2_image.IsEmpty())
         self.assertEqual(etc2_image.data, etc2_data)
 
-        #raw_image = Convert(etc2_image, OGLEnum.GL_RGBA8)
-        #self.assertEqual(raw_image.width, 2)
-        #self.assertEqual(raw_image.height, 2)
-        #self.assertEqual(raw_image.internalformat, OGLEnum.GL_RGBA8)
-        #self.assertEqual(raw_image.dataSize, len(raw_data))
-        #self.assertTrue(not raw_image.IsEmpty())
+        raw_image = Convert(etc2_image, OGLEnum.GL_RGBA8)
+        self.assertEqual(raw_image.width, 2)
+        self.assertEqual(raw_image.height, 2)
+        self.assertEqual(raw_image.internalformat, OGLEnum.GL_RGBA8)
+        self.assertEqual(raw_image.dataSize, len(raw_data))
+        self.assertTrue(not raw_image.IsEmpty())
+        self.assertEqual(raw_image.data, uncom_data)
 
 if __name__ == '__main__':
     import logging

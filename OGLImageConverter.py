@@ -93,7 +93,7 @@ _RegisterConverter(_converters, RGBA8ToETC2_ALHPA1)
 
 ETC2_ALPHA1ToRGBA8 = _Image2DConverterFactory('ETC2_ALPHA1ToRGBA8',
     OGLEnum.GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2, OGLEnum.GL_RGBA8,
-    'temp.ktx', 'temp.tga', ' '.join((ETCPACK_NAME, 'temp.ktx', os.curdir, '-ktx', '-c etc2')))
+    'temp.ktx', 'temp.tga', ' '.join((ETCPACK_NAME, 'temp.ktx', os.curdir, '-ktx', '-c etc2', '-ext TGA')))
 _RegisterConverter(_converters, ETC2_ALPHA1ToRGBA8)
 
 def Convert(input_image, dest_format):
