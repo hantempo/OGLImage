@@ -15,7 +15,30 @@ class TestImage2D(unittest.TestCase):
         self.assertEqual(str(im),
             "Image2D : dimension(2x2), internalformat(GL_RGB8), dataSize(12)")
 
-class TestImageConverter(unittest.TestCase):
+class TestUncompressionConversion(unittest.TestCase):
+
+    def test_RGB8_RGBA8(self):
+        empty_image = Image2D(2, 2, internalformat=OGLEnum.GL_RGB8, dataSize=12)
+        output = Convert(empty_image, OGLEnum.GL_RGBA8)
+        self.assertEqual(output.width, 2)
+        self.assertEqual(output.height, 2)
+        self.assertEqual(output.internalformat, OGLEnum.GL_RGBA8)
+        self.assertEqual(output.dataSize, 16)
+        self.assertTrue(output.IsEmpty())
+
+        rgb_data = 'FFFFFF0000000F0F0FF0F0F0'.decode('hex')
+        rgba_data = 'FFFFFFFF000000FF0F0F0FFFF0F0F0FF'.decode('hex')
+        rgba_image = Convert(Image2D(2, 2,
+            internalformat=OGLEnum.GL_RGB8, dataSize=len(rgb_data), data=rgb_data),
+            OGLEnum.GL_RGBA8)
+        self.assertEqual(rgba_image.width, 2)
+        self.assertEqual(rgba_image.height, 2)
+        self.assertEqual(rgba_image.internalformat, OGLEnum.GL_RGBA8)
+        self.assertEqual(rgba_image.dataSize, len(rgba_data))
+        self.assertTrue(not rgba_image.IsEmpty())
+        self.assertEqual(rgba_image.data, rgba_data)
+
+class TestETCConvertion(unittest.TestCase):
 
     def test_RGB8ToETC1(self):
         empty_image = Image2D(2, 2, internalformat=OGLEnum.GL_RGB8, dataSize=12)

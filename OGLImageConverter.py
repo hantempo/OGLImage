@@ -2,6 +2,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 import networkx as nx
+import numpy as np
 import os, sys
 
 from OGLCommon import OGLEnum, GetImageSize
@@ -21,6 +22,44 @@ def _RegisterConverter(converter_graph, converter_class):
          converter_class.dest_format,
          {'converter' : converter_class}),
         ])
+
+class _RGB8_RGBA8_Converter(object):
+    source_format = OGLEnum.GL_RGB8
+    dest_format = OGLEnum.GL_RGBA8
+
+    @staticmethod
+    def Convert(input_image):
+        dst_format = _RGB8_RGBA8_Converter.dest_format
+        src_format = _RGB8_RGBA8_Converter.source_format
+
+        # for empty image
+        width = input_image.width
+        height = input_image.height
+        dataSize = GetImageSize(width, height, dst_format)
+        if input_image.IsEmpty():
+            return Image2D(width=width, height=height,
+                internalformat=dst_format,
+                dataSize=dataSize)
+
+        logger.debug('Convert from {0} to {1}'.format(
+            OGLEnum.names[src_format],
+            OGLEnum.names[dst_format]))
+        logger.debug('Input image : {0}'.format(str(input_image)))
+
+        rgb_array = np.fromstring(input_image.data, dtype='uint8')
+        rgba_array = np.empty(dataSize, dtype='uint8')
+        for k in range(dataSize):
+            if k % 4 == 3:
+                rgba_array[k] = 255
+            else:
+                i = k % 4 + k / 4 * 3
+                rgba_array[k] = rgb_array[i]
+        output_image = Image2D(width=width, height=height,
+            internalformat=dst_format,
+            dataSize=dataSize, data=rgba_array.tostring())
+
+        logger.debug('Output image : {0}'.format(str(output_image)))
+        return output_image
 
 def _Image2DConverterFactory(class_name, src_format, dst_format,
     input_filename = None, output_filename = None, tool_cmd = None):
@@ -105,6 +144,8 @@ ETC2ToRGBA8 = _Image2DConverterFactory('ETC2ToRGBA8',
     OGLEnum.GL_COMPRESSED_RGBA8_ETC2_EAC, OGLEnum.GL_RGBA8,
     'temp.ktx', 'temp.tga', ' '.join((ETCPACK_NAME, 'temp.ktx', os.curdir, '-ktx', '-c etc2', '-ext TGA')))
 _RegisterConverter(_converters, ETC2ToRGBA8)
+
+_RegisterConverter(_converters, _RGB8_RGBA8_Converter)
 
 def Convert(input_image, dest_format):
     try:
