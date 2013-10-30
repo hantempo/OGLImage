@@ -159,6 +159,39 @@ class TestETCConvertion(unittest.TestCase):
         self.assertTrue(not raw_image.IsEmpty())
         self.assertEqual(raw_image.data, uncom_data)
 
+class TestASTCConvertion(unittest.TestCase):
+
+    def test_RGBA8ToRGBA_ASTC_4x4(self):
+        empty_image = Image2D(2, 2, internalformat=OGLEnum.GL_RGBA8, dataSize=16)
+        #output = Convert(empty_image, OGLEnum.GL_COMPRESSED_RGBA8_ETC2_EAC)
+        #self.assertEqual(output.width, 2)
+        #self.assertEqual(output.height, 2)
+        #self.assertEqual(output.internalformat, OGLEnum.GL_COMPRESSED_RGBA8_ETC2_EAC)
+        #self.assertEqual(output.dataSize, 16)
+        #self.assertTrue(output.IsEmpty())
+
+        #raw_data = 'FFFFFFFF000000000F0F0F0FF0F0F0F0'.decode('hex')
+        #etc2_data = '87F2E927B6DB6DB6FAEE00071110000E'.decode('hex')
+        #uncom_data = 'EEEEEEFF000000001010100FEEEEEEF0'.decode('hex')
+        #etc2_image = Convert(Image2D(2, 2,
+            #internalformat=OGLEnum.GL_RGBA8, dataSize=len(raw_data), data=raw_data),
+            #OGLEnum.GL_COMPRESSED_RGBA8_ETC2_EAC)
+        #self.assertEqual(etc2_image.width, 2)
+        #self.assertEqual(etc2_image.height, 2)
+        #self.assertEqual(etc2_image.internalformat, OGLEnum.GL_COMPRESSED_RGBA8_ETC2_EAC)
+        #self.assertEqual(etc2_image.dataSize, len(etc2_data))
+        #self.assertTrue(not etc2_image.IsEmpty())
+        #self.assertEqual(etc2_image.data, etc2_data)
+
+        #raw_image = Convert(etc2_image, OGLEnum.GL_RGBA8)
+        #self.assertEqual(raw_image.width, 2)
+        #self.assertEqual(raw_image.height, 2)
+        #self.assertEqual(raw_image.internalformat, OGLEnum.GL_RGBA8)
+        #self.assertEqual(raw_image.dataSize, len(raw_data))
+        #self.assertTrue(not raw_image.IsEmpty())
+        #self.assertEqual(raw_image.data, uncom_data)
+
+
 if __name__ == '__main__':
     import logging
     logging.basicConfig(level=logging.INFO)

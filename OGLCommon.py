@@ -60,6 +60,36 @@ OGLEnum = enum(
     GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2 = 0x9277,
     GL_COMPRESSED_RGBA8_ETC2_EAC    = 0x9278,
     GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC = 0x9279,
+
+    COMPRESSED_RGBA_ASTC_4x4_KHR            = 0x93B0,
+    COMPRESSED_RGBA_ASTC_5x4_KHR            = 0x93B1,
+    COMPRESSED_RGBA_ASTC_5x5_KHR            = 0x93B2,
+    COMPRESSED_RGBA_ASTC_6x5_KHR            = 0x93B3,
+    COMPRESSED_RGBA_ASTC_6x6_KHR            = 0x93B4,
+    COMPRESSED_RGBA_ASTC_8x5_KHR            = 0x93B5,
+    COMPRESSED_RGBA_ASTC_8x6_KHR            = 0x93B6,
+    COMPRESSED_RGBA_ASTC_8x8_KHR            = 0x93B7,
+    COMPRESSED_RGBA_ASTC_10x5_KHR           = 0x93B8,
+    COMPRESSED_RGBA_ASTC_10x6_KHR           = 0x93B9,
+    COMPRESSED_RGBA_ASTC_10x8_KHR           = 0x93BA,
+    COMPRESSED_RGBA_ASTC_10x10_KHR          = 0x93BB,
+    COMPRESSED_RGBA_ASTC_12x10_KHR          = 0x93BC,
+    COMPRESSED_RGBA_ASTC_12x12_KHR          = 0x93BD,
+
+    COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR    = 0x93D0,
+    COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR    = 0x93D1,
+    COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR    = 0x93D2,
+    COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR    = 0x93D3,
+    COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR    = 0x93D4,
+    COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR    = 0x93D5,
+    COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR    = 0x93D6,
+    COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR    = 0x93D7,
+    COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR   = 0x93D8,
+    COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR   = 0x93D9,
+    COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR   = 0x93DA,
+    COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR  = 0x93DB,
+    COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR  = 0x93DC,
+    COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR  = 0x93DD,
     )
 
 ETC_64BIT_FORMATS = (
@@ -83,9 +113,55 @@ PIXEL_SIZE_4 = (
     OGLEnum.GL_RGBA8,
 )
 
+ASTC_FORMAT_BLOCK_DIMENSION = {
+    OGLEnum.COMPRESSED_RGBA_ASTC_4x4_KHR            : (4, 4),
+    OGLEnum.COMPRESSED_RGBA_ASTC_5x4_KHR            : (5, 4),
+    OGLEnum.COMPRESSED_RGBA_ASTC_5x5_KHR            : (5, 5),
+    OGLEnum.COMPRESSED_RGBA_ASTC_6x5_KHR            : (6, 5),
+    OGLEnum.COMPRESSED_RGBA_ASTC_6x6_KHR            : (6, 6),
+    OGLEnum.COMPRESSED_RGBA_ASTC_8x5_KHR            : (8, 5),
+    OGLEnum.COMPRESSED_RGBA_ASTC_8x6_KHR            : (8, 6),
+    OGLEnum.COMPRESSED_RGBA_ASTC_8x8_KHR            : (8, 8),
+    OGLEnum.COMPRESSED_RGBA_ASTC_10x5_KHR           : (10, 5),
+    OGLEnum.COMPRESSED_RGBA_ASTC_10x6_KHR           : (10, 6),
+    OGLEnum.COMPRESSED_RGBA_ASTC_10x8_KHR           : (10, 8),
+    OGLEnum.COMPRESSED_RGBA_ASTC_10x10_KHR          : (10, 10),
+    OGLEnum.COMPRESSED_RGBA_ASTC_12x10_KHR          : (12, 10),
+    OGLEnum.COMPRESSED_RGBA_ASTC_12x12_KHR          : (12, 12),
+
+    OGLEnum.COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR            : (4, 4),
+    OGLEnum.COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR            : (5, 4),
+    OGLEnum.COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR            : (5, 5),
+    OGLEnum.COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR            : (6, 5),
+    OGLEnum.COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR            : (6, 6),
+    OGLEnum.COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR            : (8, 5),
+    OGLEnum.COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR            : (8, 6),
+    OGLEnum.COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR            : (8, 8),
+    OGLEnum.COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR           : (10, 5),
+    OGLEnum.COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR           : (10, 6),
+    OGLEnum.COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR           : (10, 8),
+    OGLEnum.COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR          : (10, 10),
+    OGLEnum.COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR          : (12, 10),
+    OGLEnum.COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR          : (12, 12),
+}
+
+def GetASTCCompressionImageSize(width, height, internalformat):
+    if not IsASTCCompressionFormat(internalformat):
+        return 0
+
+    bwidth, bheight = ASTC_FORMAT_BLOCK_DIMENSION[internalformat]
+    return ((width + bwidth - 1) / bwidth) * ((height + bheight - 1) / bheight) * 16
+
+def IsASTCCompressionFormat(internalformat):
+    return OGLEnum.COMPRESSED_RGBA_ASTC_4x4_KHR <= internalformat \
+        <= OGLEnum.COMPRESSED_RGBA_ASTC_12x12_KHR or \
+           OGLEnum.COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR <= internalformat \
+        <= OGLEnum.COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR
+
 def IsCompressionFormat(internalformat):
     if internalformat in ETC_64BIT_FORMATS or \
-       internalformat in ETC_128BIT_FORMATS:
+       internalformat in ETC_128BIT_FORMATS or \
+       IsASTCCompressionFormat(internalformat):
        return True
     else:
        return False
@@ -153,5 +229,8 @@ def GetImageSize(width, height, internalformat):
 
     if internalformat in ETC_128BIT_FORMATS:
         return ((width+3)/4) * ((height+3)/4) * 16
+
+    if IsASTCCompressionFormat(internalformat):
+        return GetASTCCompressionImageSize(width, height, internalformat)
 
     return width * height * GetPixelSize(internalformat)
