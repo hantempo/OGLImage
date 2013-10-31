@@ -30,6 +30,7 @@ OGLEnum = enum(
     GL_INT                          = 0x1404,
     GL_UNSIGNED_INT                 = 0x1405,
     GL_FLOAT                        = 0x1406,
+    GL_HALF_FLOAT                   = 0x140B,
     GL_FIXED                        = 0x140C,
 
     GL_DEPTH_COMPONENT              = 0x1902,
@@ -168,6 +169,23 @@ def IsCompressionFormat(internalformat):
        return True
     else:
        return False
+
+def GetSizedInternalFormat(glFormat, glType):
+    if glFormat == OGLEnum.GL_RGB:
+        if glType == OGLEnum.GL_UNSIGNED_BYTE:
+            return OGLEnum.GL_RGB8
+        elif glType == OGLEnum.GL_UNSIGNED_SHORT_5_6_5:
+            return OGLEnum.GL_RGB565
+
+    if glFormat == OGLEnum.GL_RGBA:
+        if glType == OGLEnum.GL_UNSIGNED_BYTE:
+            return OGLEnum.GL_RGBA8
+        elif glType == OGLEnum.GL_UNSIGNED_SHORT_4_4_4_4:
+            return OGLEnum.GL_RGBA4
+        elif glType == OGLEnum.GL_UNSIGNED_SHORT_5_5_5_1:
+            return OGLEnum.GL_RGB5_A1
+
+    logger.error('GetSizedInternalFormat, unexpected glFormat ({0}) and glType ({1})'.format(glFormat, glType))
 
 def GetGLType(internalformat):
     mapping = {

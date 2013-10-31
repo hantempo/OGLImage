@@ -170,9 +170,9 @@ class TestASTCConvertion(unittest.TestCase):
         self.assertEqual(output.dataSize, 16)
         self.assertTrue(output.IsEmpty())
 
-        raw_data = 'FFFFFFFF000000000F0F0F0FF0F0F0F0'.decode('hex')
-        astc_data = '42287E08E001E001FE1FFE1F0000C0C0'.decode('hex')
-        uncom_data = 'EEEEEEFF000000001010100FEEEEEEF0'.decode('hex')
+        raw_data = 'FF0F0FFF000000000F0F0F0FF0F0F0F0'.decode('hex')
+        astc_data = '225045993CF236DCF00B01C0973A15C0'.decode('hex')
+        uncom_data = 'FF1010FF000000000F0F0F0FF0F0F0F0'.decode('hex')
         astc_image = Convert(Image2D(2, 2,
             internalformat=OGLEnum.GL_RGBA8, dataSize=len(raw_data), data=raw_data),
             OGLEnum.GL_COMPRESSED_RGBA_ASTC_4x4_KHR)
@@ -183,14 +183,13 @@ class TestASTCConvertion(unittest.TestCase):
         self.assertTrue(not astc_image.IsEmpty())
         self.assertEqual(astc_image.data, astc_data)
 
-        #raw_image = Convert(astc_image, OGLEnum.GL_RGBA8)
-        #self.assertEqual(raw_image.width, 2)
-        #self.assertEqual(raw_image.height, 2)
-        #self.assertEqual(raw_image.internalformat, OGLEnum.GL_RGBA8)
-        #self.assertEqual(raw_image.dataSize, len(raw_data))
-        #self.assertTrue(not raw_image.IsEmpty())
-        #self.assertEqual(raw_image.data, uncom_data)
-
+        raw_image = Convert(astc_image, OGLEnum.GL_RGBA8)
+        self.assertEqual(raw_image.width, 2)
+        self.assertEqual(raw_image.height, 2)
+        self.assertEqual(raw_image.internalformat, OGLEnum.GL_RGBA8)
+        self.assertEqual(raw_image.dataSize, len(uncom_data))
+        self.assertTrue(not raw_image.IsEmpty())
+        self.assertEqual(raw_image.data, uncom_data)
 
 if __name__ == '__main__':
     import logging

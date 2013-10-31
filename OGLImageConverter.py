@@ -97,8 +97,15 @@ def _RegisterASTCConverter(src_format, dst_format,
     TEMP_PREFIX = 'temp'
     src_filename = '.'.join((TEMP_PREFIX, src_file_format.lower()))
     dst_filename = '.'.join((TEMP_PREFIX, dst_file_format.lower()))
-    (bwidth, bheight) = OGLCommon.ASTC_FORMAT_TO_BLOCK_DIMENSION[dst_format]
-    tool_cmd = ' '.join((ASTCENC_NAME, '-c', src_filename, dst_filename, '{0}x{1}'.format(bwidth, bheight), '-thorough'))
+    is_encode = OGLCommon.IsASTCCompressionFormat(dst_format)
+    if is_encode:
+        (bwidth, bheight) = OGLCommon.ASTC_FORMAT_TO_BLOCK_DIMENSION[dst_format]
+
+    # Note : During compression, if RGB channels are identical for all pixels, they will be combined into one channel
+    # and after compression become alpha image instead of RGB
+    # TODO : convert A to RGB if the image from decompression contains alpha
+    tool_cmd = ' '.join((ASTCENC_NAME, '-cl' if is_encode else '-dl', src_filename, dst_filename,
+        '{0}x{1}'.format(bwidth, bheight) if is_encode else '', '-thorough'))
 
     def _convert(input_image):
         width = input_image.width
@@ -116,8 +123,8 @@ def _RegisterASTCConverter(src_format, dst_format,
         RunCommand(tool_cmd)
         output_image = LoadImage(dst_filename)
 
-        Delete(src_filename)
-        Delete(dst_filename)
+        #Delete(src_filename)
+        #Delete(dst_filename)
 
         return output_image
 
@@ -141,6 +148,7 @@ _RegisterETCConverter(OGLEnum.GL_COMPRESSED_RGBA8_ETC2_EAC, OGLEnum.GL_RGBA8,
     'KTX', 'TGA', '-ext TGA')
 
 _RegisterASTCConverter(OGLEnum.GL_RGBA8, OGLEnum.GL_COMPRESSED_RGBA_ASTC_4x4_KHR, 'KTX', 'ASTC')
+_RegisterASTCConverter(OGLEnum.GL_COMPRESSED_RGBA_ASTC_4x4_KHR, OGLEnum.GL_RGBA8, 'ASTC', 'KTX')
 
 _RegisterImageConverter(OGLEnum.GL_RGB8, OGLEnum.GL_RGBA8, RGB8_RGBA8)
 
