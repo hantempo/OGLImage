@@ -5,12 +5,14 @@ import networkx as nx
 import numpy as np
 import os, sys
 
+import OGLCommon
 from OGLCommon import OGLEnum, GetImageSize
 from UtilCommon import Which, RunCommand, Delete
 from OGLImage import Image2D
 from OGLImageIO import SaveImage, LoadImage
 
 ETCPACK_NAME = 'etcpack'
+ASTCENC_NAME = 'astcenc'
 
 # construct and register converter classes
 _converters = nx.DiGraph()
@@ -89,6 +91,38 @@ def _RegisterETCConverter(src_format, dst_format,
 
     _RegisterImageConverter(src_format, dst_format, _convert)
 
+def _RegisterASTCConverter(src_format, dst_format,
+    src_file_format, dst_file_format):
+
+    TEMP_PREFIX = 'temp'
+    src_filename = '.'.join((TEMP_PREFIX, src_file_format.lower()))
+    dst_filename = '.'.join((TEMP_PREFIX, dst_file_format.lower()))
+    (bwidth, bheight) = OGLCommon.ASTC_FORMAT_TO_BLOCK_DIMENSION[dst_format]
+    tool_cmd = ' '.join((ASTCENC_NAME, '-c', src_filename, dst_filename, '{0}x{1}'.format(bwidth, bheight), '-thorough'))
+
+    def _convert(input_image):
+        width = input_image.width
+        height = input_image.height
+        dataSize = GetImageSize(width, height, dst_format)
+
+        tool_filename = ASTCENC_NAME
+        if not Which(tool_filename):
+            logger.error('Cannot find the specified tool ({0}) in the environment $PATH, return an empty image with dest format'.format(tool_filename))
+            return Image2D(width=width, height=height,
+                internalformat=dst_format,
+                dataSize=dataSize)
+
+        SaveImage(src_filename, input_image)
+        RunCommand(tool_cmd)
+        output_image = LoadImage(dst_filename)
+
+        Delete(src_filename)
+        Delete(dst_filename)
+
+        return output_image
+
+    _RegisterImageConverter(src_format, dst_format, _convert)
+
 _RegisterETCConverter(OGLEnum.GL_RGB8, OGLEnum.GL_ETC1_RGB8_OES,
     'PPM', 'KTX', '-c etc1')
 _RegisterETCConverter(OGLEnum.GL_ETC1_RGB8_OES, OGLEnum.GL_RGB8,
@@ -105,6 +139,8 @@ _RegisterETCConverter(OGLEnum.GL_RGBA8, OGLEnum.GL_COMPRESSED_RGBA8_ETC2_EAC,
     'TGA', 'KTX', '-f RGBA8')
 _RegisterETCConverter(OGLEnum.GL_COMPRESSED_RGBA8_ETC2_EAC, OGLEnum.GL_RGBA8,
     'KTX', 'TGA', '-ext TGA')
+
+_RegisterASTCConverter(OGLEnum.GL_RGBA8, OGLEnum.GL_COMPRESSED_RGBA_ASTC_4x4_KHR, 'KTX', 'ASTC')
 
 _RegisterImageConverter(OGLEnum.GL_RGB8, OGLEnum.GL_RGBA8, RGB8_RGBA8)
 

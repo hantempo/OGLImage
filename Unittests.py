@@ -163,27 +163,27 @@ class TestASTCConvertion(unittest.TestCase):
 
     def test_RGBA8ToRGBA_ASTC_4x4(self):
         empty_image = Image2D(2, 2, internalformat=OGLEnum.GL_RGBA8, dataSize=16)
-        #output = Convert(empty_image, OGLEnum.GL_COMPRESSED_RGBA8_ETC2_EAC)
-        #self.assertEqual(output.width, 2)
-        #self.assertEqual(output.height, 2)
-        #self.assertEqual(output.internalformat, OGLEnum.GL_COMPRESSED_RGBA8_ETC2_EAC)
-        #self.assertEqual(output.dataSize, 16)
-        #self.assertTrue(output.IsEmpty())
+        output = Convert(empty_image, OGLEnum.GL_COMPRESSED_RGBA_ASTC_4x4_KHR)
+        self.assertEqual(output.width, 2)
+        self.assertEqual(output.height, 2)
+        self.assertEqual(output.internalformat, OGLEnum.GL_COMPRESSED_RGBA_ASTC_4x4_KHR)
+        self.assertEqual(output.dataSize, 16)
+        self.assertTrue(output.IsEmpty())
 
-        #raw_data = 'FFFFFFFF000000000F0F0F0FF0F0F0F0'.decode('hex')
-        #etc2_data = '87F2E927B6DB6DB6FAEE00071110000E'.decode('hex')
-        #uncom_data = 'EEEEEEFF000000001010100FEEEEEEF0'.decode('hex')
-        #etc2_image = Convert(Image2D(2, 2,
-            #internalformat=OGLEnum.GL_RGBA8, dataSize=len(raw_data), data=raw_data),
-            #OGLEnum.GL_COMPRESSED_RGBA8_ETC2_EAC)
-        #self.assertEqual(etc2_image.width, 2)
-        #self.assertEqual(etc2_image.height, 2)
-        #self.assertEqual(etc2_image.internalformat, OGLEnum.GL_COMPRESSED_RGBA8_ETC2_EAC)
-        #self.assertEqual(etc2_image.dataSize, len(etc2_data))
-        #self.assertTrue(not etc2_image.IsEmpty())
-        #self.assertEqual(etc2_image.data, etc2_data)
+        raw_data = 'FFFFFFFF000000000F0F0F0FF0F0F0F0'.decode('hex')
+        astc_data = '42287E08E001E001FE1FFE1F0000C0C0'.decode('hex')
+        uncom_data = 'EEEEEEFF000000001010100FEEEEEEF0'.decode('hex')
+        astc_image = Convert(Image2D(2, 2,
+            internalformat=OGLEnum.GL_RGBA8, dataSize=len(raw_data), data=raw_data),
+            OGLEnum.GL_COMPRESSED_RGBA_ASTC_4x4_KHR)
+        self.assertEqual(astc_image.width, 2)
+        self.assertEqual(astc_image.height, 2)
+        self.assertEqual(astc_image.internalformat, OGLEnum.GL_COMPRESSED_RGBA_ASTC_4x4_KHR)
+        self.assertEqual(astc_image.dataSize, len(astc_data))
+        self.assertTrue(not astc_image.IsEmpty())
+        self.assertEqual(astc_image.data, astc_data)
 
-        #raw_image = Convert(etc2_image, OGLEnum.GL_RGBA8)
+        #raw_image = Convert(astc_image, OGLEnum.GL_RGBA8)
         #self.assertEqual(raw_image.width, 2)
         #self.assertEqual(raw_image.height, 2)
         #self.assertEqual(raw_image.internalformat, OGLEnum.GL_RGBA8)
