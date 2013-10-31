@@ -20,15 +20,12 @@ _converters = nx.DiGraph()
 def RGB8_RGBA8(input_image):
     width = input_image.width
     height = input_image.height
+    pixel_count = width * height
     dataSize = GetImageSize(width, height, OGLEnum.GL_RGBA8)
-    rgb_array = np.fromstring(input_image.data, dtype='uint8')
-    rgba_array = np.empty(dataSize, dtype='uint8')
-    for k in range(dataSize):
-        if k % 4 == 3:
-            rgba_array[k] = 255
-        else:
-            i = k % 4 + k / 4 * 3
-            rgba_array[k] = rgb_array[i]
+    rgb_array = np.fromstring(input_image.data, dtype='uint8').reshape((pixel_count, 3))
+    a_array = np.empty((pixel_count, 1), dtype='uint8')
+    a_array.fill(255)
+    rgba_array = np.c_[rgb_array, a_array]
     return Image2D(width=width, height=height,
         internalformat=OGLEnum.GL_RGBA8,
         dataSize=dataSize, data=rgba_array.tostring())
