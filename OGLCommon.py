@@ -45,14 +45,17 @@ OGLEnum = enum(
     GL_UNSIGNED_SHORT_5_6_5         = 0x8363,
 
     GL_RGB8                         = 0x8051,
+    GL_RGBA4                        = 0x8056,
+    GL_RGB5_A1                      = 0x8057,
     GL_RGBA8                        = 0x8058,
     GL_RGB10_A2                     = 0x8059,
     GL_DEPTH_COMPONENT24            = 0x81A6,
-    GL_RGBA4                        = 0x8056,
-    GL_RGB5_A1                      = 0x8057,
-    GL_RGB565                       = 0x8D62,
     GL_DEPTH_COMPONENT16            = 0x81A5,
+    GL_SRGB                         = 0x8C40,
+    GL_SRGB8                        = 0x8C41,
+    GL_SRGB8_ALPHA8                 = 0x8C43,
     GL_STENCIL_INDEX8               = 0x8D48,
+    GL_RGB565                       = 0x8D62,
 
     GL_ETC1_RGB8_OES                = 0x8D64,
     GL_COMPRESSED_RGB8_ETC2         = 0x9274,
@@ -112,10 +115,12 @@ PIXEL_SIZE_2 = (
 
 PIXEL_SIZE_3 = (
     OGLEnum.GL_RGB8,
+    OGLEnum.GL_SRGB8,
 )
 
 PIXEL_SIZE_4 = (
     OGLEnum.GL_RGBA8,
+    OGLEnum.GL_SRGB8_ALPHA8,
 )
 
 ASTC_FORMAT_TO_BLOCK_DIMENSION = {
