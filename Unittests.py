@@ -80,26 +80,26 @@ class TestUncompressionConversion(unittest.TestCase):
         self.assertTrue(not rgb8_image.IsEmpty())
         self.assertEqual(rgb8_image.data, rgb8_data)
 
-    #def test_RGB8_SRGB8(self):
-        #empty_image = Image2D(2, 1, internalformat=OGLEnum.GL_RGB8, dataSize=6)
-        #output = Convert(empty_image, OGLEnum.GL_SRGB8)
-        #self.assertEqual(output.width, 2)
-        #self.assertEqual(output.height, 1)
-        #self.assertEqual(output.internalformat, OGLEnum.GL_SRGB8)
-        #self.assertEqual(output.dataSize, 6)
-        #self.assertTrue(output.IsEmpty())
+    def test_RGB8_SRGB8(self):
+        empty_image = Image2D(2, 1, internalformat=OGLEnum.GL_RGB8, dataSize=6)
+        output = Convert(empty_image, OGLEnum.GL_SRGB8)
+        self.assertEqual(output.width, 2)
+        self.assertEqual(output.height, 1)
+        self.assertEqual(output.internalformat, OGLEnum.GL_SRGB8)
+        self.assertEqual(output.dataSize, 6)
+        self.assertTrue(output.IsEmpty())
 
-        #rgb8_data = 'FF0FF0000AA0'.decode('hex')
-        #rgb565_data = '7DF85300'.decode('hex')
-        #rgb565_image = Convert(Image2D(2, 1,
-            #internalformat=OGLEnum.GL_RGB8, dataSize=len(rgb8_data), data=rgb8_data),
-            #OGLEnum.GL_RGB565)
-        #self.assertEqual(rgb565_image.width, 2)
-        #self.assertEqual(rgb565_image.height, 1)
-        #self.assertEqual(rgb565_image.internalformat, OGLEnum.GL_RGB565)
-        #self.assertEqual(rgb565_image.dataSize, len(rgb565_data))
-        #self.assertTrue(not rgb565_image.IsEmpty())
-        #self.assertEqual(rgb565_image.data, rgb565_data)
+        srgb8_data = 'FE0CEF00009F'.decode('hex')
+        rgb8_data = 'FF01DE000059'.decode('hex')
+        srgb8_image = Convert(Image2D(2, 1,
+            internalformat=OGLEnum.GL_RGB8, dataSize=len(rgb8_data), data=rgb8_data),
+            OGLEnum.GL_SRGB8)
+        self.assertEqual(srgb8_image.width, 2)
+        self.assertEqual(srgb8_image.height, 1)
+        self.assertEqual(srgb8_image.internalformat, OGLEnum.GL_SRGB8)
+        self.assertEqual(srgb8_image.dataSize, len(srgb8_data))
+        self.assertTrue(not srgb8_image.IsEmpty())
+        self.assertEqual(srgb8_image.data, srgb8_data)
 
     def test_SRGB8_RGB8(self):
         empty_image = Image2D(2, 1, internalformat=OGLEnum.GL_SRGB8, dataSize=6)
