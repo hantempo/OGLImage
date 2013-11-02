@@ -111,6 +111,8 @@ ETC_128BIT_FORMATS = (
 
 PIXEL_SIZE_2 = (
     OGLEnum.GL_RGB565,
+    OGLEnum.GL_RGBA4,
+    OGLEnum.GL_RGB5_A1,
 )
 
 PIXEL_SIZE_3 = (
@@ -196,10 +198,15 @@ def GetSizedInternalFormat(glFormat, glType):
 
     logger.error('GetSizedInternalFormat, unexpected glFormat ({0}) and glType ({1})'.format(glFormat, glType))
 
+# from sized internal format to GL type
 def GetGLType(internalformat):
     mapping = {
+        OGLEnum.GL_SRGB8        : OGLEnum.GL_UNSIGNED_BYTE,
         OGLEnum.GL_RGB8         : OGLEnum.GL_UNSIGNED_BYTE,
         OGLEnum.GL_RGBA8        : OGLEnum.GL_UNSIGNED_BYTE,
+        OGLEnum.GL_RGB565       : OGLEnum.GL_UNSIGNED_SHORT_5_6_5,
+        OGLEnum.GL_RGBA4        : OGLEnum.GL_UNSIGNED_SHORT_4_4_4_4,
+        OGLEnum.GL_RGB5_A1      : OGLEnum.GL_UNSIGNED_SHORT_5_5_5_1,
     }
     if IsCompressionFormat(internalformat):
         return 0
@@ -216,6 +223,9 @@ def GetGLTypeSize(glType):
         OGLEnum.GL_UNSIGNED_BYTE        : 1,
         OGLEnum.GL_SHORT                : 2,
         OGLEnum.GL_UNSIGNED_SHORT       : 2,
+        OGLEnum.GL_UNSIGNED_SHORT_5_6_5 : 2,
+        OGLEnum.GL_UNSIGNED_SHORT_4_4_4_4 : 2,
+        OGLEnum.GL_UNSIGNED_SHORT_5_5_5_1 : 2,
         OGLEnum.GL_INT                  : 4,
         OGLEnum.GL_UNSIGNED_INT         : 4,
     }
@@ -228,11 +238,31 @@ def GetGLTypeSize(glType):
             logger.error('GetGLTypeSize, unexpected type ({0})'.format(OGLEnum.names[glType]))
             return 0
 
+def GetGLTypeNumpyType(glType):
+    mapping = {
+        OGLEnum.GL_BYTE                     : 'int8',
+        OGLEnum.GL_UNSIGNED_BYTE            : 'uint8',
+        OGLEnum.GL_SHORT                    : 'int16',
+        OGLEnum.GL_UNSIGNED_SHORT           : 'uint16',
+        OGLEnum.GL_UNSIGNED_SHORT_5_6_5     : 'uint16',
+        OGLEnum.GL_UNSIGNED_SHORT_4_4_4_4   : 'uint16',
+        OGLEnum.GL_UNSIGNED_SHORT_5_5_5_1   : 'uint16',
+        OGLEnum.GL_INT                      : 'int32',
+        OGLEnum.GL_UNSIGNED_INT             : 'uint32',
+    }
+    try:
+        return mapping[glType]
+    except:
+        logger.error('GetGLTypeNumpyType, unexpected type ({0})'.format(OGLEnum.names[glType]))
+        return 'uint8'
 
 def GetGLFormat(internalformat):
     mapping = {
         OGLEnum.GL_RGB8         : OGLEnum.GL_RGB,
+        OGLEnum.GL_RGB565       : OGLEnum.GL_RGB,
         OGLEnum.GL_RGBA8        : OGLEnum.GL_RGBA,
+        OGLEnum.GL_RGBA4        : OGLEnum.GL_RGBA,
+        OGLEnum.GL_RGB5_A1      : OGLEnum.GL_RGBA,
     }
     if IsCompressionFormat(internalformat):
         return 0
@@ -242,6 +272,23 @@ def GetGLFormat(internalformat):
         except:
             logger.error('GetGLFormat, unexpected internalformat ({0})'.format(OGLEnum.names[internalformat]))
             return 0
+
+# How many separate elements in this internalformat, consider to endiness
+def GetElementCount(internalformat):
+    mapping = {
+        OGLEnum.GL_SRGB8        : 3,
+        OGLEnum.GL_SRGB8_ALPHA8 : 4,
+        OGLEnum.GL_RGB8         : 3,
+        OGLEnum.GL_RGB565       : 1,
+        OGLEnum.GL_RGBA8        : 4,
+        OGLEnum.GL_RGBA4        : 1,
+        OGLEnum.GL_RGB5_A1      : 1,
+    }
+    try:
+        return mapping[internalformat]
+    except:
+        logger.error('GetElementCount, unexpected internalformat ({0})'.format(OGLEnum.names[internalformat]))
+        return 0
 
 # return pixel size in bytes
 def GetPixelSize(internalformat):

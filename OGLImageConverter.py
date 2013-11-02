@@ -17,88 +17,6 @@ ASTCENC_NAME = 'astcenc'
 # construct and register converter classes
 _converters = nx.DiGraph()
 
-def RGB8_RGBA8(input_image):
-    width = input_image.width
-    height = input_image.height
-    pixel_count = width * height
-    dataSize = GetImageSize(width, height, OGLEnum.GL_RGBA8)
-    rgb_array = np.fromstring(input_image.data, dtype='uint8').reshape((pixel_count, 3))
-    a_array = np.empty((pixel_count, 1), dtype='uint8')
-    a_array.fill(255)
-    rgba_array = np.c_[rgb_array, a_array]
-    return Image2D(width=width, height=height,
-        internalformat=OGLEnum.GL_RGBA8,
-        dataSize=dataSize, data=rgba_array.tostring())
-
-def RGB8_RGB565(input_image):
-    width = input_image.width
-    height = input_image.height
-    pixel_count = width * height
-    dataSize = GetImageSize(width, height, OGLEnum.GL_RGB565)
-    rgb8_array = np.fromstring(input_image.data, dtype='uint8').reshape((pixel_count, 3))
-    def convertion(rgb):
-        red, green, blue = rgb
-        red = red * (pow(2, 5) - 1) / 0xFF
-        green = green * (pow(2, 6) - 1) / 0xFF
-        blue = blue * (pow(2, 5) - 1) / 0xFF
-        return red << 11 | green << 5 | blue
-    rgb565_array = np.array(map(convertion, rgb8_array), dtype='uint16')
-    return Image2D(width=width, height=height,
-        internalformat=OGLEnum.GL_RGB565,
-        dataSize=dataSize, data=rgb565_array.tostring())
-
-def RGB565_RGB8(input_image):
-    width = input_image.width
-    height = input_image.height
-    pixel_count = width * height
-    dataSize = GetImageSize(width, height, OGLEnum.GL_RGB8)
-    rgb565_array = np.fromstring(input_image.data, dtype='uint16')
-    def convertion(rgb):
-        red = ((rgb >> 11) & 0x1F) * 0xFF / 0x1F
-        green = ((rgb >> 5) & 0x3F) * 0xFF / 0x3F
-        blue = (rgb & 0x1F) * 0xFF / 0x1F
-        return (red, green, blue)
-    rgb8_array = np.array(map(convertion, rgb565_array), dtype='uint8')
-    return Image2D(width=width, height=height,
-        internalformat=OGLEnum.GL_RGB8,
-        dataSize=dataSize, data=rgb8_array.tostring())
-
-def SRGB8_RGB8(input_image):
-    width = input_image.width
-    height = input_image.height
-    pixel_count = width * height
-    dataSize = GetImageSize(width, height, OGLEnum.GL_SRGB8)
-    srgb8_array = np.fromstring(input_image.data, dtype='uint8')
-    def convertion(sc):
-        sc /= 255.
-        if sc > 0.04045:
-            lc = pow((sc + 0.055) / 1.055, 2.4)
-        else:
-            lc = sc / 12.92
-        return int(lc * 255)
-    rgb8_array = np.array(map(convertion, srgb8_array), dtype='uint8')
-    return Image2D(width=width, height=height,
-        internalformat=OGLEnum.GL_RGB8,
-        dataSize=dataSize, data=rgb8_array.tostring())
-
-def RGB8_SRGB8(input_image):
-    width = input_image.width
-    height = input_image.height
-    pixel_count = width * height
-    dataSize = GetImageSize(width, height, OGLEnum.GL_RGB8)
-    rgb8_array = np.fromstring(input_image.data, dtype='uint8')
-    def convertion(lc):
-        lc /= 255.
-        if lc >= 0.0031308:
-            sc = pow(lc, 0.41666) * 1.055 - 0.055
-        else:
-            sc = lc * 12.92
-        return int(sc * 255)
-    srgb8_array = np.array(map(convertion, rgb8_array), dtype='uint8')
-    return Image2D(width=width, height=height,
-        internalformat=OGLEnum.GL_SRGB8,
-        dataSize=dataSize, data=srgb8_array.tostring())
-
 def _RegisterImageConverter(src_format, dst_format, convert_func):
 
     def _convert(input_image):
@@ -125,6 +43,63 @@ def _RegisterImageConverter(src_format, dst_format, convert_func):
     _converters.add_nodes_from([src_format, dst_format])
     _converters.add_edges_from([(src_format, dst_format,
         {'converter' : _convert})])
+
+# Function factory between uncompressed formats
+def _RegisterBasicImageConverter(src_format, dst_format, pixel_conversion):
+    src_dtype = OGLCommon.GetGLTypeNumpyType(OGLCommon.GetGLType(src_format))
+    dst_dtype = OGLCommon.GetGLTypeNumpyType(OGLCommon.GetGLType(dst_format))
+    element_count = OGLCommon.GetElementCount(src_format)
+
+    def _convert(input_image):
+        width = input_image.width
+        height = input_image.height
+        src_array = np.fromstring(input_image.data, dtype=src_dtype).reshape((-1, element_count))
+        dst_data = np.array(map(pixel_conversion, src_array), dtype=dst_dtype).tostring()
+        return Image2D(width=width, height=height,
+            internalformat=dst_format,
+            dataSize=len(dst_data), data=dst_data)
+
+    _RegisterImageConverter(src_format, dst_format, _convert)
+
+_RegisterBasicImageConverter(OGLEnum.GL_RGB8, OGLEnum.GL_RGBA8,
+    lambda pixel : (pixel[0], pixel[1], pixel[2], 255))
+
+def RGB8_RGB565(pixel):
+    red, green, blue = pixel
+    red = red * (pow(2, 5) - 1) / 0xFF
+    green = green * (pow(2, 6) - 1) / 0xFF
+    blue = blue * (pow(2, 5) - 1) / 0xFF
+    return red << 11 | green << 5 | blue
+_RegisterBasicImageConverter(OGLEnum.GL_RGB8, OGLEnum.GL_RGB565, RGB8_RGB565)
+
+def RGB565_RGB8(pixel):
+    red = ((pixel >> 11) & 0x1F) * 0xFF / 0x1F
+    green = ((pixel >> 5) & 0x3F) * 0xFF / 0x3F
+    blue = (pixel & 0x1F) * 0xFF / 0x1F
+    return (red, green, blue)
+_RegisterBasicImageConverter(OGLEnum.GL_RGB565, OGLEnum.GL_RGB8, RGB565_RGB8)
+
+def SRGB8_RGB8(pixel):
+    def _convert(sc):
+        sc /= 255.
+        if sc > 0.04045:
+            lc = pow((sc + 0.055) / 1.055, 2.4)
+        else:
+            lc = sc / 12.92
+        return int(lc * 255)
+    return map(_convert, pixel)
+_RegisterBasicImageConverter(OGLEnum.GL_SRGB8, OGLEnum.GL_RGB8, SRGB8_RGB8)
+
+def RGB8_SRGB8(pixel):
+    def _convert(lc):
+        lc /= 255.
+        if lc >= 0.0031308:
+            sc = pow(lc, 0.41666) * 1.055 - 0.055
+        else:
+            sc = lc * 12.92
+        return int(sc * 255)
+    return map(_convert, pixel)
+_RegisterBasicImageConverter(OGLEnum.GL_RGB8, OGLEnum.GL_SRGB8, RGB8_SRGB8)
 
 def _RegisterETCConverter(src_format, dst_format,
     src_file_format, dst_file_format, extra_option=''):
@@ -215,12 +190,6 @@ _RegisterETCConverter(OGLEnum.GL_COMPRESSED_RGBA8_ETC2_EAC, OGLEnum.GL_RGBA8,
 
 _RegisterASTCConverter(OGLEnum.GL_RGBA8, OGLEnum.GL_COMPRESSED_RGBA_ASTC_4x4_KHR, 'KTX', 'ASTC')
 _RegisterASTCConverter(OGLEnum.GL_COMPRESSED_RGBA_ASTC_4x4_KHR, OGLEnum.GL_RGBA8, 'ASTC', 'KTX')
-
-_RegisterImageConverter(OGLEnum.GL_RGB8, OGLEnum.GL_RGBA8, RGB8_RGBA8)
-_RegisterImageConverter(OGLEnum.GL_RGB8, OGLEnum.GL_RGB565, RGB8_RGB565)
-_RegisterImageConverter(OGLEnum.GL_RGB565, OGLEnum.GL_RGB8, RGB565_RGB8)
-_RegisterImageConverter(OGLEnum.GL_RGB8, OGLEnum.GL_SRGB8, RGB8_SRGB8)
-_RegisterImageConverter(OGLEnum.GL_SRGB8, OGLEnum.GL_RGB8, SRGB8_RGB8)
 
 def Convert(input_image, dest_format):
     try:
