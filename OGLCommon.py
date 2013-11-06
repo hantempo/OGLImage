@@ -1,8 +1,6 @@
 import logging
 logger = logging.getLogger(__name__)
 
-from math import ceil
-
 def enum(*sequential, **named):
     enums = dict(zip(sequential, range(len(sequential))), **named)
     reverse = dict((value, key) for key, value in enums.iteritems())

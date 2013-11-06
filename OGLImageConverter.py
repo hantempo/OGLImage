@@ -3,7 +3,7 @@ logger = logging.getLogger(__name__)
 
 import networkx as nx
 import numpy as np
-import os, sys
+import os
 
 import OGLCommon
 from OGLCommon import OGLEnum, GetImageSize

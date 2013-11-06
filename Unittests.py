@@ -1,8 +1,8 @@
 import unittest
 
 from OGLCommon import OGLEnum
-from OGLImage import *
-from OGLImageConverter import *
+from OGLImage import Image2D
+from OGLImageConverter import Convert
 
 class TestImage2D(unittest.TestCase):
 

@@ -4,7 +4,6 @@ logger = logging.getLogger(__name__)
 import subprocess, os, shutil
 
 def Which(program):
-    import os
     def is_exe(fpath):
         return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
 
